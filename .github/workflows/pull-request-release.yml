@@ -65,17 +65,22 @@ jobs:
 
               preview_version="${version}-preview.${PR_NUMBER}.${SHA:0:7}"
 
+              # Update package.json version safely
+              tmpfile="$(mktemp)"
+              jq ".version = \"$preview_version\"" package.json > "$tmpfile" && mv "$tmpfile" package.json
+
+
               is_private=$(jq -r '.private // false' package.json)
               if [ "$is_private" != "true" ]; then
                 echo "📤 Publishing $pkg_name@$preview_version"
-                pnpm publish --new-version "$preview_version" --tag canary --no-git-checks
+                pnpm publish --access public --no-git-checks
                 published_versions+=("$pkg_name@$preview_version")
               else
                 echo "🚫 Skipping private package $pkg_name"
               fi
 
               # Generate changelog snippet
-              changelog+="# $pkg_name\n$(git-cliff --latest --limit 10)\n\n"
+              changelog+="# $pkg_name\n$(git-cliff --latest -- 10)\n\n"
             else
               echo "ℹ️  No bump for $pkg_name"
             fi
