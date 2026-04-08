@@ -1,0 +1,112 @@
+name: Release Packages - Pull Request
+
+env:
+  GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+  NPM_TOKEN: ${{ secrets.NPM_TOKEN }}
+
+on:
+  pull_request:
+    branches:
+      - main
+    types: [opened, synchronize, reopened]
+
+jobs:
+  pull-request-release:
+    name: Pull Request Release
+    runs-on: ubuntu-latest
+    permissions:
+      contents: read
+      pull-requests: write
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0 # Fetch full history for git-cliff
+
+      - name: Setup
+        uses: ./.github/actions/setup
+
+      - name: Configure npm
+        run: npm config set //registry.npmjs.org/:_authToken $NPM_TOKEN
+
+      - name: Install git-cliff
+        uses: taiki-e/install-action@git-cliff
+
+      - name: Publish package and comment on PR
+        run: |
+          set -euo pipefail
+
+          PR_NUMBER=${{ github.event.pull_request.number }}
+          SHA=${{ github.sha }}
+          REPO=${{ github.repository }}
+
+          repo_root="$(pwd)"
+          declare -a published_versions
+          changelog=""
+
+          # Find all package.json files, excluding node_modules
+          mapfile -t package_files < <(find . -path "./node_modules" -prune -o -name "package.json" -print)
+
+          for pkg_path in "${package_files[@]}"; do
+            pkg_dir="$(dirname "$pkg_path")"
+            cd "$pkg_dir" || continue
+
+            echo "📦 Processing $pkg_path"
+
+            pkg_name=$(jq -r '.name' package.json)
+            current_version=$(jq -r '.version' package.json)
+
+            # Detect bumped version
+            raw_version=$(git-cliff --bumped-version | tr -d '\r\n')
+            version="${raw_version##*@}"
+
+            if [ -n "$version" ] && [ "$version" != "$current_version" ]; then
+              echo "⬆️  Bump detected for $pkg_name: $current_version -> $version"
+
+              preview_version="${version}-preview.${PR_NUMBER}.${SHA:0:7}"
+
+              is_private=$(jq -r '.private // false' package.json)
+              if [ "$is_private" != "true" ]; then
+                echo "📤 Publishing $pkg_name@$preview_version"
+                pnpm publish --new-version "$preview_version" --tag canary --no-git-checks
+                published_versions+=("$pkg_name@$preview_version")
+              else
+                echo "🚫 Skipping private package $pkg_name"
+              fi
+
+              # Generate changelog snippet
+              changelog+="# $pkg_name\n$(git-cliff --latest --limit 10)\n\n"
+            else
+              echo "ℹ️  No bump for $pkg_name"
+            fi
+
+            cd "$repo_root"
+          done
+
+          if [ ${#published_versions[@]} -gt 0 ]; then
+            comment="## Pull Request Release
+
+            ### Published Versions:
+            $(printf ' - %s\n' "${published_versions[@]}")
+            
+            ### Installation:
+            \`\`\`bash
+            npm install ${published_versions[0]}  # or pnpm add
+            \`\`\`
+            
+            ### Changelog Highlights:
+            $changelog"
+
+            # Check for existing bot comment
+            existing_comment_id=$(gh api repos/$REPO/issues/$PR_NUMBER/comments --jq '.[] | select(.user.login == "github-actions[bot]" and (.body | contains("## Pull Request Release"))) | .id' | head -1)
+
+            if [ -n "$existing_comment_id" ]; then
+              echo "📝 Updating existing comment"
+              gh api -X PATCH repos/$REPO/issues/comments/$existing_comment_id -f body="$comment"
+            else
+              echo "💬 Posting new comment"
+              gh pr comment $PR_NUMBER --body "$comment"
+            fi
+          else
+            echo "ℹ️  No packages to publish"
+          fi
