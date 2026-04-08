@@ -1,53 +1,168 @@
-# Turborepo starter
+# Avivox Monorepo
 
-This Turborepo starter is maintained by the Turborepo core team.
+A modern monorepo setup for building scalable applications with Next.js, shared UI components, and robust tooling.
 
-## Using this example
+## Overview
 
-Run the following command:
+This monorepo contains:
 
-```sh
-npx create-turbo@latest
+- **Web App**: A Next.js application (`apps/web`)
+- **UI Library**: Shared React components (`packages/ui`)
+- **ESLint Config**: Shared ESLint configurations (`packages/eslint-config`)
+- **TypeScript Config**: Shared TypeScript configurations (`packages/typescript-config`)
+
+Built with modern tools including Turborepo for build orchestration, pnpm for package management, and comprehensive testing and linting setups.
+
+## Tech Stack
+
+- **Framework**: Next.js 16 with React 19
+- **Build Tool**: Turborepo
+- **Package Manager**: pnpm
+- **Language**: TypeScript
+- **Testing**: Jest
+- **Linting**: ESLint with custom configs
+- **Code Formatting**: Prettier
+- **Changelog**: git-cliff
+
+## Getting Started
+
+### Prerequisites
+
+- Node.js >= 18
+- pnpm >= 8.15
+
+### Installation
+
+1. Clone the repository:
+   ```bash
+   git clone https://github.com/abhisin98/avivox-monorepo.git
+   cd avivox-monorepo
+   ```
+
+2. Install dependencies:
+   ```bash
+   pnpm install
+   ```
+
+### Development
+
+Start the development server:
+```bash
+pnpm dev
 ```
 
-## What's inside?
+This will start the web app at `http://localhost:3000`.
 
-This Turborepo includes the following packages/apps:
+### Building
 
-### Apps and Packages
-
-- `docs`: a [Next.js](https://nextjs.org/) app
-- `web`: another [Next.js](https://nextjs.org/) app
-- `@repo/ui`: a stub React component library shared by both `web` and `docs` applications
-- `@repo/eslint-config`: `eslint` configurations (includes `eslint-config-next` and `eslint-config-prettier`)
-- `@repo/typescript-config`: `tsconfig.json`s used throughout the monorepo
-
-Each package/app is 100% [TypeScript](https://www.typescriptlang.org/).
-
-### Utilities
-
-This Turborepo has some additional tools already setup for you:
-
-- [TypeScript](https://www.typescriptlang.org/) for static type checking
-- [ESLint](https://eslint.org/) for code linting
-- [Prettier](https://prettier.io) for code formatting
-
-### Build
-
-To build all apps and packages, run the following command:
-
-With [global `turbo`](https://turborepo.dev/docs/getting-started/installation#global-installation) installed (recommended):
-
-```sh
-cd my-turborepo
-turbo build
+Build all packages and apps:
+```bash
+pnpm build
 ```
 
-Without global `turbo`, use your package manager:
+Build only packages:
+```bash
+pnpm build:packages
+```
 
-```sh
-cd my-turborepo
-npx turbo build
+## Scripts
+
+- `pnpm dev` - Start development servers
+- `pnpm build` - Build all apps and packages
+- `pnpm lint` - Lint all code
+- `pnpm type-check` - Run TypeScript type checking
+- `pnpm test` - Run tests
+- `pnpm clean` - Clean build artifacts
+- `pnpm format` - Format code with Prettier
+
+## Project Structure
+
+```
+├── apps/
+│   └── web/                 # Next.js web application
+│       ├── app/
+│       │   ├── layout.tsx
+│       │   └── page.tsx
+│       ├── next.config.ts
+│       └── package.json
+├── packages/
+│   ├── eslint-config/       # Shared ESLint configurations
+│   │   ├── default.js
+│   │   ├── react.js
+│   │   └── ...
+│   ├── typescript-config/   # Shared TypeScript configurations
+│   │   ├── nextjs.json
+│   │   ├── react.json
+│   │   └── ...
+│   └── ui/                  # Shared React UI components
+│       ├── src/
+│       │   ├── button.tsx
+│       │   ├── card.tsx
+│       │   └── ...
+│       └── package.json
+├── turbo.json               # Turborepo configuration
+├── pnpm-workspace.yaml      # pnpm workspace configuration
+└── package.json             # Root package.json
+```
+
+## Packages
+
+### @avivox-monorepo/ui
+
+A shared React component library built with Rsbuild.
+
+**Usage:**
+```tsx
+import { Button } from "@avivox-monorepo/ui/button";
+
+<Button appName="my-app">Click me</Button>
+```
+
+### @avivox-monorepo/eslint-config
+
+Shared ESLint configurations for different environments:
+- `default` - Base configuration
+- `react` - React-specific rules
+- `node` - Node.js rules
+- `graphql` - GraphQL rules
+- `native` - React Native rules
+
+### @avivox-monorepo/typescript-config
+
+Shared TypeScript configurations:
+- `nextjs.json` - For Next.js apps
+- `react.json` - For React libraries
+- `node.json` - For Node.js packages
+- `native.json` - For React Native
+
+## Contributing
+
+Please follow the [commit message guidelines](./commit-message-guidelines.md) for all commits.
+
+### Commit Types
+
+- `feat` - New features
+- `fix` - Bug fixes
+- `docs` - Documentation changes
+- `style` - Code style changes
+- `refactor` - Code refactoring
+- `perf` - Performance improvements
+- `test` - Testing changes
+- `chore` - Maintenance tasks
+- `ci` - CI/CD changes
+- `build` - Build system changes
+
+### Scopes
+
+Use appropriate scopes like `web`, `@avivox-monorepo/ui`, etc.
+
+## Changelog
+
+Changelogs are automatically generated using git-cliff. See [cliff.toml](./cliff.toml) for configuration.
+
+## Author
+
+[abhisin98](https://github.com/abhisin98)
 yarn dlx turbo build
 pnpm exec turbo build
 ```
