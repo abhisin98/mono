@@ -1,0 +1,73 @@
+name: Continuous Integration
+
+env:
+  # Environment Variables:
+  # - Used to configure settings such as database connections and API keys.
+  # - It's best to store sensitive values in GitHub Secrets for security.
+  D: ""
+
+on:
+  push:
+    branches:
+      - main # Runs the workflow when code is pushed directly to the `main` branch.
+
+  pull_request:
+    branches:
+      - main
+    types: [opened, synchronize, reopened]
+
+jobs:
+  lint:
+    name: Lint ✅
+    runs-on: ubuntu-latest
+    steps:
+      - name: Check out code # Fetches the latest code from the repository.
+        uses: actions/checkout@v4
+
+      - name: Setup # Executes setup scripts for dependencies.
+        uses: ./.github/actions/setup
+
+      - name: Lint
+        run: pnpm lint
+
+  type-check:
+    name: Type Check 📝
+    needs: lint # Ensures `lint` job runs first before this job executes.
+    runs-on: ubuntu-latest
+    steps:
+      - name: Check out code
+        uses: actions/checkout@v4
+
+      - name: Setup
+        uses: ./.github/actions/setup
+
+      - name: Type Check
+        run: pnpm type-check
+
+  test:
+    name: Test 🧪
+    needs: type-check
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Setup
+        uses: ./.github/actions/setup
+
+      - name: Test
+        run: pnpm test
+
+  build:
+    name: Build 🏗️
+    needs: test
+    runs-on: ubuntu-latest
+    steps:
+      - name: Check out code
+        uses: actions/checkout@v4
+
+      - name: Setup
+        uses: ./.github/actions/setup
+
+      - name: ⚡️ Build apps and packages
+        run: pnpm build
