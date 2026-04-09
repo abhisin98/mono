@@ -37,9 +37,9 @@ If the commit reverts a previous commit, it should begin with `revert: `, follow
 ### Accepted scopes
 
 - `web`
-- `@avivox-monorepo/eslint-config`
-- `@avivox-monorepo/typescript-config`
-- `@avivox-monorepo/ui`
+- `eslint-config`
+- `typescript-config`
+- `ui`
 
 Multiple scopes can be listed: `type(scope-1, scope-2): description`
 
