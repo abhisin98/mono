@@ -1,0 +1,24 @@
+name: Rollback Release
+
+on:
+  workflow_dispatch:
+    inputs:
+      deploy_id:
+        description: "Deployment ID to rollback"
+        required: true
+      npm_version:
+        description: "NPM version to rollback (optional)"
+        required: false
+
+jobs:
+  rollback:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Redeploy Railway build
+        run: railway redeploy --id ${{ github.event.inputs.deploy_id }} --token "$RAILWAY_TOKEN_PROD"
+
+      - name: Re-publish npm version
+        if: ${{ github.event.inputs.npm_version != '' }}
+        run: |
+          pnpm version ${{ github.event.inputs.npm_version }}
+          pnpm publish --tag latest --no-git-checks

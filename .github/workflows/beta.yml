@@ -1,0 +1,48 @@
+name: Beta Deployment
+
+on:
+  pull_request:
+    branches:
+      - main
+
+jobs:
+  ci:
+    name: CI
+    runs-on: ubuntu-latest
+    steps:
+      - name: Check out code # Fetches the latest code from the repository.
+        uses: actions/checkout@v4
+
+      - name: Setup # Executes setup scripts for dependencies.
+        uses: ./.github/actions/setup
+
+      - name: Run CI Action
+        uses: ./.github/actions/ci
+
+  deploy-web:
+    name: Deploy Web (Beta)
+    needs: ci
+    runs-on: ubuntu-latest
+    steps:
+      - name: Check out code # Fetches the latest code from the repository.
+        uses: actions/checkout@v4
+
+      - name: Setup # Executes setup scripts for dependencies.
+        uses: ./.github/actions/setup
+
+      - name: Deploy (Staging)
+        run: echo "Deploy Web in environment beta"
+
+  publish-packages:
+    name: Publish Packages (Beta)
+    needs: ci
+    runs-on: ubuntu-latest
+    steps:
+      - name: Check out code # Fetches the latest code from the repository.
+        uses: actions/checkout@v4
+
+      - name: Setup # Executes setup scripts for dependencies.
+        uses: ./.github/actions/setup
+
+      - name: Publish Packages (Staging)
+        run: echo "Publish Packages with tag beta"

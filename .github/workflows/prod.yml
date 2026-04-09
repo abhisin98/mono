@@ -1,0 +1,48 @@
+name: Production Deployment
+
+on:
+  push:
+    branches:
+      - main
+
+jobs:
+  ci:
+    name: CI
+    runs-on: ubuntu-latest
+    steps:
+      - name: Check out code # Fetches the latest code from the repository.
+        uses: actions/checkout@v4
+
+      - name: Setup # Executes setup scripts for dependencies.
+        uses: ./.github/actions/setup
+
+      - name: Run CI Action
+        uses: ./.github/actions/ci
+
+  deploy-web:
+    name: Deploy Web (Prod)
+    needs: ci
+    runs-on: ubuntu-latest
+    steps:
+      - name: Check out code # Fetches the latest code from the repository.
+        uses: actions/checkout@v4
+
+      - name: Setup # Executes setup scripts for dependencies.
+        uses: ./.github/actions/setup
+
+      - name: Deploy (Production)
+        run: echo "Deploy Web in environment production"
+
+  publish-packages:
+    name: Publish Packages (Prod)
+    needs: ci
+    runs-on: ubuntu-latest
+    steps:
+      - name: Check out code # Fetches the latest code from the repository.
+        uses: actions/checkout@v4
+
+      - name: Setup # Executes setup scripts for dependencies.
+        uses: ./.github/actions/setup
+
+      - name: Publish Packages (Production)
+        run: echo "Publish Packages with tag latest"
