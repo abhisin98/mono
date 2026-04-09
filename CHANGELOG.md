@@ -3,6 +3,13 @@
 All notable changes to this project will be documented in this file. See [conventional commits](https://www.conventionalcommits.org/) for commit guidelines.
 
 ---
+## [avivox-monorepo@2.1.0](https://github.com/abhisin98/mono/compare/avivox-monorepo@2.0.1..avivox-monorepo@2.1.0) - 2026-04-09
+
+### Features
+
+- **(typescript-config)** update TypeScript target version to es2023 - ([eca4617](https://github.com/abhisin98/mono/commit/eca4617680806a84707093a4c8c88a797ed9cc87)) - abhisin98
+
+---
 ## [avivox-monorepo@2.0.1](https://github.com/abhisin98/mono/compare/avivox-monorepo@2.0.0..avivox-monorepo@2.0.1) - 2026-04-09
 
 ### Documentation
