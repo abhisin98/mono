@@ -3,7 +3,14 @@
 All notable changes to this project will be documented in this file. See [conventional commits](https://www.conventionalcommits.org/) for commit guidelines.
 
 ---
-## [2.0.0] - 2026-04-09
+## [avivox-monorepo@2.0.1](https://github.com/abhisin98/mono/compare/avivox-monorepo@2.0.0..avivox-monorepo@2.0.1) - 2026-04-09
+
+### Documentation
+
+- update accepted scopes in commit message guidelines - ([1f61d12](https://github.com/abhisin98/mono/commit/1f61d120e962884b39288a8d0b4d7dab8a13677f)) - abhisin98
+
+---
+## [avivox-monorepo@2.0.0] - 2026-04-09
 
 ### Features
 
