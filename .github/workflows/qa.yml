@@ -19,30 +19,30 @@ jobs:
       - name: Run CI Action
         uses: ./.github/actions/ci
 
-  deploy-web:
-    name: Deploy Web (QA)
-    needs: ci
-    runs-on: ubuntu-latest
-    steps:
-      - name: Check out code # Fetches the latest code from the repository.
-        uses: actions/checkout@v4
+  # deploy-web:
+  #   name: Deploy Web (QA)
+  #   needs: ci
+  #   runs-on: ubuntu-latest
+  #   steps:
+  #     - name: Check out code # Fetches the latest code from the repository.
+  #       uses: actions/checkout@v4
 
-      - name: Setup # Executes setup scripts for dependencies.
-        uses: ./.github/actions/setup
+  #     - name: Setup # Executes setup scripts for dependencies.
+  #       uses: ./.github/actions/setup
 
-      - name: Deploy (QA)
-        run: echo "Deploy Web in environment qa"
+  #     - name: Deploy (QA)
+  #       run: echo "Deploy Web in environment qa"
 
-  publish-packages:
-    name: Publish Packages (QA)
-    needs: ci
-    runs-on: ubuntu-latest
-    steps:
-      - name: Check out code # Fetches the latest code from the repository.
-        uses: actions/checkout@v4
+  # publish-packages:
+  #   name: Publish Packages (QA)
+  #   needs: ci
+  #   runs-on: ubuntu-latest
+  #   steps:
+  #     - name: Check out code # Fetches the latest code from the repository.
+  #       uses: actions/checkout@v4
 
-      - name: Setup # Executes setup scripts for dependencies.
-        uses: ./.github/actions/setup
+  #     - name: Setup # Executes setup scripts for dependencies.
+  #       uses: ./.github/actions/setup
 
-      - name: Publish Packages (QA)
-        run: echo "Publish Packages with tag qa"
+  #     - name: Publish Packages (QA)
+  #       run: echo "Publish Packages with tag qa"

@@ -19,33 +19,33 @@ jobs:
       - name: Run CI Action
         uses: ./.github/actions/ci
 
-  deploy-web:
-    name: Deploy Web (Patch)
-    needs: ci
-    runs-on: ubuntu-latest
-    steps:
-      - name: Check out code # Fetches the latest code from the repository.
-        uses: actions/checkout@v4
+  # deploy-web:
+  #   name: Deploy Web (Patch)
+  #   needs: ci
+  #   runs-on: ubuntu-latest
+  #   steps:
+  #     - name: Check out code # Fetches the latest code from the repository.
+  #       uses: actions/checkout@v4
 
-      - name: Setup # Executes setup scripts for dependencies.
-        uses: ./.github/actions/setup
+  #     - name: Setup # Executes setup scripts for dependencies.
+  #       uses: ./.github/actions/setup
 
-      - name: Deploy Hotfix to Production
-        run: echo "Deploy in environment production"
+  #     - name: Deploy Hotfix to Production
+  #       run: echo "Deploy in environment production"
 
-  publish-packages:
-    name: Publish Packages (Patch)
-    needs: ci
-    runs-on: ubuntu-latest
-    steps:
-      - name: Check out code # Fetches the latest code from the repository.
-        uses: actions/checkout@v4
+  # publish-packages:
+  #   name: Publish Packages (Patch)
+  #   needs: ci
+  #   runs-on: ubuntu-latest
+  #   steps:
+  #     - name: Check out code # Fetches the latest code from the repository.
+  #       uses: actions/checkout@v4
 
-      - name: Setup # Executes setup scripts for dependencies.
-        uses: ./.github/actions/setup
+  #     - name: Setup # Executes setup scripts for dependencies.
+  #       uses: ./.github/actions/setup
 
-      - name: Update packages version
-        run: echo "patch vesion updated in package.json"
+  #     - name: Update packages version
+  #       run: echo "patch vesion updated in package.json"
 
-      - name: Publish Hotfix to Production
-        run: echo "Packages Publish with tag latest"
+  #     - name: Publish Hotfix to Production
+  #       run: echo "Packages Publish with tag latest"
