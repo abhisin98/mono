@@ -66,16 +66,18 @@ jobs:
         run: |
           set -euo pipefail
 
+          # Save repo root for navigation
+          repo_root="$(pwd)"
+
+          # Find all package.json files, excluding node_modules
+          mapfile -t package_files < <(find . -path "./node_modules" -prune -o -name "package.json" -print)
+
           PR_NUMBER=${{ github.event.pull_request.number }}
           SHA=${{ github.sha }}
           REPO=${{ github.repository }}
 
-          repo_root="$(pwd)"
-          declare -a published_versions
           changelog=""
-
-          # Find all package.json files, excluding node_modules
-          mapfile -t package_files < <(find . -path "./node_modules" -prune -o -name "package.json" -print)
+          declare -a published_versions
 
           for pkg_path in "${package_files[@]}"; do
             pkg_dir="$(dirname "$pkg_path")"
@@ -83,13 +85,25 @@ jobs:
 
             echo "📦 Processing $pkg_path"
 
+            # Get package name for git-cliff tag pattern
             pkg_name=$(jq -r '.name' package.json)
-            current_version=$(jq -r '.version' package.json)
 
-            # Detect bumped version
-            raw_version=$(git-cliff --bumped-version | tr -d '\r\n')
+            # Check if any tags exist for this package
+            if git tag --list "${pkg_name}@*" | head -1 | grep -q .; then
+              # Tags exist, use tag pattern
+              bump_output=$(git-cliff --tag-pattern "${pkg_name}@*" --bump -o CHANGELOG.md 2>&1)
+              raw_version=$(git-cliff --tag-pattern "${pkg_name}@*" --bumped-version | tr -d '\r\n')
+            else
+              # First run, no tags yet, run without tag pattern
+              bump_output=$(git-cliff --bump -o CHANGELOG.md 2>&1)
+              raw_version=$(git-cliff --bumped-version | tr -d '\r\n')
+            fi
+            echo "$bump_output"
+
             version="${raw_version##*@}"
 
+            # Only proceed if version actually changed
+            current_version=$(jq -r '.version' package.json)
             if [ -n "$version" ] && [ "$version" != "$current_version" ]; then
               echo "⬆️  Bump detected for $pkg_name: $current_version -> $version"
 
@@ -99,7 +113,7 @@ jobs:
               tmpfile="$(mktemp)"
               jq ".version = \"$beta_version\"" package.json > "$tmpfile" && mv "$tmpfile" package.json
 
-
+              # Publish if not private
               is_private=$(jq -r '.private // false' package.json)
               if [ "$is_private" != "true" ]; then
                 echo "📤 Publishing $pkg_name@$beta_version"
@@ -110,11 +124,13 @@ jobs:
               fi
 
               # Generate changelog snippet
-              changelog+="# $pkg_name\n$(git-cliff --latest -- 10)\n\n"
+              changelog+=$'# $pkg_name\n'
+              changelog+="$(git-cliff --unreleased)\n\n"
             else
-              echo "ℹ️  No bump for $pkg_name"
+              echo "ℹ️  No version bump for $pkg_path (current: $current_version, detected: $version)"
             fi
 
+            # Return to repo root
             cd "$repo_root"
           done
 

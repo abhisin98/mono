@@ -99,8 +99,8 @@ jobs:
             # Only proceed if version actually changed
             current_version=$(jq -r '.version' package.json)
             if [ -n "$version" ] && [ "$version" != "$current_version" ]; then
-              echo "⬆️  Updating $pkg_path from $current_version to $version"
-
+              echo "⬆️  Bump detected for $pkg_name: $current_version -> $version"
+              
               # Update package.json version safely
               tmpfile="$(mktemp)"
               jq ".version = \"$version\"" package.json > "$tmpfile" && mv "$tmpfile" package.json
