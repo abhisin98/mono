@@ -142,7 +142,11 @@ jobs:
             
             ### Installation:
             \`\`\`bash
-            npm install ${published_versions[0]}  # or pnpm add
+            # Install any of the published versions individually
+            $(printf 'pnpm add %s  # or npm install\n' "${published_versions[@]}")
+
+            # Or install all at once
+            pnpm add ${published_versions[*]}  # or npm install
             \`\`\`
             
             ### Changelog Highlights:

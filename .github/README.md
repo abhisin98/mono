@@ -19,7 +19,7 @@ We follow a structured branching strategy to manage deployments across different
 
 - **`main`**: The production branch. Merging here triggers CI checks and production deployment.
 - **`dev/*`**: Development branches (e.g., `dev/feature-name`). Used for initial development and testing. Triggers deployment to the development environment.
-- **`qa/*`**: QA branches (e.g., `qa/release-1.0`). Used for quality assurance testing. Triggers deployment to the QA environment.
+- **`qa/*`**: QA branches (e.g., `qa/feature-name`). Used for quality assurance testing. Triggers deployment to the QA environment.
 - **`patch/*`**: Hotfix branches (e.g., `patch/security-fix`). Used for urgent production fixes. Triggers patch deployment directly to production.
 - **Pull Requests to `main`**: Triggers beta deployment for staging and final testing before production.
 
@@ -65,6 +65,22 @@ We follow a structured branching strategy to manage deployments across different
   - **Deploy Web**: Deploys hotfixes to the production environment
   - **Publish Packages**: Updates package versions and publishes with the `latest` tag
 
+### Create QA Branch (create-qa.yml)
+- **Trigger**: Manually triggered through the GitHub Actions UI
+- **Purpose**: Automates the creation of a QA branch from a development branch
+- **Inputs** (provided when triggering):
+  - `dev_branch`: The development branch name (e.g., `dev/feature-login`) (required)
+- **Jobs**:
+  - **Create QA Branch**: Fetches the dev branch, creates a corresponding QA branch (replacing `dev/` with `qa/`), and pushes it to the remote
+
+### Create Beta Release PR (create-beta.yml)
+- **Trigger**: Manually triggered through the GitHub Actions UI
+- **Purpose**: Automates the creation of a pull request to merge a QA branch into `main` for beta deployment
+- **Inputs** (provided when triggering):
+  - `qa_branch`: The QA branch name (e.g., `qa/feature-name`) (required)
+- **Jobs**:
+  - **Create Beta PR**: Creates a pull request from the specified QA branch to `main` with auto-generated title and description. Merging this PR triggers the beta deployment workflow.
+
 ### Rollback (rollback.yml)
 - **Trigger**: Manually triggered through the GitHub Actions UI
 - **Purpose**: Reverts deployments and package versions in case of issues
@@ -94,13 +110,15 @@ The following secrets must be configured in your GitHub repository settings unde
    - Test your changes in the dev environment
 
 3. **Move to QA**:
-   - Create a QA branch: `git checkout -b qa/release-name`
-   - Merge your dev branch into the QA branch
+   - Use the "Create QA Branch" workflow (manually triggered) to automatically create a `qa/*` branch from your `dev/*` branch, or create one manually: `git checkout -b qa/release-name`
+   - Merge your dev branch into the QA branch (if created manually)
    - Push the QA branch to trigger deployment to QA environment
    - Notify QA team for testing
 
 4. **Prepare for Production**:
-   - Create a pull request from your QA branch to `main`
+   - Create a pull request from your QA branch to `main` by either:
+     - Using the "Create Beta Release PR" workflow (manually triggered) to automatically create a PR, or
+     - Creating one manually through GitHub's UI
    - The PR will trigger beta deployment for final testing
    - After approval, merge the PR to `main`
    - This triggers production deployment
@@ -135,8 +153,10 @@ If a deployment causes issues in production:
 Dev → QA → Beta → Prod → Patch → Rollback
 
 1. **Development** (`dev/*` branches) → **Dev Environment**
+   - Use "Create QA Branch" workflow to promote dev branch to QA
 2. **QA Testing** (`qa/*` branches) → **QA Environment**
 3. **Staging** (PR to `main`) → **Beta Environment**
+   - Use "Create Beta Release PR" workflow to promote QA branch to main
 4. **Production** (merge to `main`) → **Production Environment**
 5. **Hotfixes** (`patch/*` branches) → **Production Environment** (bypasses normal flow)
 6. **Rollback** (manual) → Reverts to previous stable state
