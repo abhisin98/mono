@@ -3,6 +3,13 @@
 All notable changes to this project will be documented in this file. See [conventional commits](https://www.conventionalcommits.org/) for commit guidelines.
 
 ---
+## [avivox-monorepo@2.2.2](https://github.com/abhisin98/mono/compare/avivox-monorepo@2.2.1..avivox-monorepo@2.2.2) - 2026-04-11
+
+### Documentation
+
+- **(ci)** update README and workflows for QA and beta processes - ([3f241c3](https://github.com/abhisin98/mono/commit/3f241c3a0815f896be3f17147799a7010c37a2f5)) - abhisin98
+
+---
 ## [avivox-monorepo@2.2.1](https://github.com/abhisin98/mono/compare/avivox-monorepo@2.2.0..avivox-monorepo@2.2.1) - 2026-04-10
 
 ### Bug Fixes
